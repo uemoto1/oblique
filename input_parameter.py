@@ -1,31 +1,37 @@
 #!/usr/bin/env python3
 
-data = [
-    {
-        "name": "calculation", "variable": [
-            {"name": "theory", "type": "character(256)",  "default": "'1d'", "dimension": ""},
-        ]
-    },
-    {
-        "name": "control", "variable": [
-            {"name": "sysname", "type": "character(256)",  "default": "''", "dimension": ""},
-            {"name": "base_directory", "type": "character(256)",  "default": "''", "dimension": ""},
-        ]
-    },
-    {
-        "name": "multiscale", "variable": [
-            {"name": "fdtddim", "type": "character(256)",  "default": "''", "dimension": ""},
-            {"name": "nx_m", "type": "integer",  "default": "1", "dimension": ""},
-            {"name": "ny_m", "type": "integer",  "default": "1", "dimension": ""},
-            {"name": "nz_m", "type": "integer",  "default": "1", "dimension": ""},
-            {"name": "hx_m", "type": "real(8)",  "default": "1e2", "dimension": ""},
-            {"name": "hy_m", "type": "real(8)",  "default": "1e2", "dimension": ""},
-            {"name": "hz_m", "type": "real(8)",  "default": "1e2", "dimension": ""},
-            {"name": "nxvacl_m", "type": "integer",  "default": "1000", "dimension": ""},
-            {"name": "nxvacr_m", "type": "integer",  "default": "1000", "dimension": ""},
-        ]
-    },
-]
+def construct():
+    add_kw("calculation", "theory", "character(256)", default="'1d'")
+    add_kw("tgrid", "nt", "integer", default="0")
+    add_kw("tgrid", "dt", "real(8)", default="0.0d0")
+    add_kw("emfield", "e_impulse", "real(8)", default="0.0d0")
+    add_kw("emfield", "ae_shape1", "character(256)", default="'none'")
+    add_kw("emfield", "E_amplitude1", "real(8)", default="0.0d0")
+    add_kw("emfield", "I_wcm2_1", "real(8)", default="-1.0d0")
+    add_kw("emfield", "tw1", "real(8)", default="0.0d0")
+    add_kw("emfield", "omega1", "real(8)", default="0.0d0")
+    add_kw("emfield", "epdir_re1", "real(8)", default="0.0d0", dimension=3)
+    add_kw("emfield", "epdir_im1", "real(8)", default="0.0d0", dimension=3)
+    add_kw("emfield", "phi_cep1", "real(8)", default="0.0d0")
+    add_kw("emfield", "ae_shape2", "character(256)", default="'none'")
+    add_kw("emfield", "E_amplitude2", "real(8)", default="0.0d0")
+    add_kw("emfield", "I_wcm2_2", "real(8)", default="-1.0d0")
+    add_kw("emfield", "tw2", "real(8)", default="0.0d0")
+    add_kw("emfield", "omega2", "real(8)", default="0.0d0")
+    add_kw("emfield", "epdir_re2", "real(8)", default="0.0d0", dimension=3)
+    add_kw("emfield", "epdir_im2", "real(8)", default="0.0d0", dimension=3)
+    add_kw("emfield", "phi_cep2", "real(8)", default="0.0d0")
+    add_kw("emfield", "t1_t2", "real(8)", default="0.0d0")
+    add_kw("emfield", "t1_start", "real(8)", default="0.0d0")
+    add_kw("multiscale", "fdtddim", "character(256)", default="''")
+    add_kw("multiscale", "nx_m", "integer", default="1")
+    add_kw("multiscale", "ny_m", "integer", default="1")
+    add_kw("multiscale", "nz_m", "integer", default="1")
+    add_kw("multiscale", "hx_m", "real(8)", default="1.0d2")
+    add_kw("multiscale", "hy_m", "real(8)", default="1.0d2")
+    add_kw("multiscale", "hz_m", "real(8)", default="1.0d2")
+    add_kw("multiscale", "nxvacl_m", "integer", default="1000")
+    add_kw("multiscale", "nxvacr_m", "integer", default="1000")
 
 
 
@@ -35,24 +41,12 @@ data = [
 
 
 
+import collections
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+data = collections.defaultdict(dict)
+def add_kw(group, name, f90type, default=None, dimension=0):
+    global data
+    data[group][name] = (f90type, default, dimension)
 
 template = """
 module input_parameter
@@ -94,85 +88,72 @@ end module input_parameter
 def create_define():
     tmp = []
     for group in data:
-        group_name = group["name"]
-        tmp += ["    ! {GROUP}".format(GROUP=group_name)]
-        for variable in group["variable"]:
-            variable_name = variable["name"]
-            variable_type = variable["type"]
-            variable_dimension = variable.get("dimension", "")
-            if variable_dimension:
-                tmp += ["    {TYPE}, dimension({DIMENSION}) :: {NAME}".format(
-                    TYPE=variable_type,
-                    DIMENSION=variable_dimension,
-                    NAME=variable_name,
+        for name in data[group]:
+            f90type, default, dimension = data[group][name]
+            if dimension:
+                tmp += ["{F90TYPE}, dimension({DIMENSION}) :: {NAME}".format(
+                    F90TYPE=f90type,
+                    DIMENSION=dimension,
+                    NAME=name,
                 )]
             else:
-                tmp += ["    {TYPE} :: {NAME}".format(
-                    TYPE=variable_type,
-                    NAME=variable_name,
+                tmp += ["{F90TYPE} :: {NAME}".format(
+                    F90TYPE=f90type,
+                    NAME=name,
                 )]   
     return "\n".join(tmp)
 
 def create_read():
     tmp = []
     for group in data:
-        group_name = group["name"]
-        tmp += ["    read(ifp, nml={GROUP}, iostat=iret)".format(
-            GROUP=group_name
-        )]
-        tmp += ["    rewind(ifp)"]
+        tmp += ["read(ifp, nml={GROUP}, iostat=iret); rewind(ifp)".format(GROUP=group)]
     return "\n".join(tmp)
 
 def create_namelist():
     tmp = []
     for group in data:
-        group_name = group["name"]
-        tmp2 = []
-        for variable in group["variable"]:
-            variable_name = variable["name"]
-            tmp2 += ["    & {NAME}".format(NAME=variable_name)]
-        tmp += ["    namelist/{GROUP}/ &".format(GROUP=group_name)]
-        tmp += [", &\n".join(tmp2)]
+        tmp += ["namelist/{GROUP}/{LIST}".format(
+            GROUP=group,
+            LIST=", &\n".join(data[group].keys())
+        )]
     return "\n".join(tmp)
+
 
 def create_default():
     tmp = []
     for group in data:
-        group_name = group["name"]
-        for variable in group["variable"]:
-            variable_name = variable["name"]
-            variable_default = variable.get("default", "")
-            if variable_default:
-                tmp += ["    {NAME} = {DEFAULT}".format(
-                    NAME=variable_name,
-                    DEFAULT=variable_default
+        for name in data[group]:
+            f90type, default, dimension = data[group][name]
+            if default:
+                tmp += ["{NAME} = {DEFAULT}".format(
+                    NAME=name,
+                    DEFAULT=default
                 )]
     return "\n".join(tmp)
 
 def create_vardump():
     tmp = []
     for group in data:
-        group_name = group["name"]
-        tmp += ["    write(*, '(a)') '# {GROUP}:'".format(
-            GROUP=group_name
-        )]
-        for variable in group["variable"]:
-            variable_name = variable["name"]
-            variable_type = variable["type"]
-            if "real" in variable_type:
-                tmp += ["    write(*, '(a,100es25.15e3)') '#     {NAME}:', {NAME}".format(
-                    NAME=variable_name
-                )]
-            elif "integer" in variable_type:
-                tmp += ["    write(*, '(a,100i10)') '#     {NAME}:', {NAME}".format(
-                    NAME=variable_name
-                )]
-            elif "character" in variable_type:
-                tmp += ["    write(*, '(a,a)') '#     {NAME}:', trim({NAME})".format(
-                    NAME=variable_name
-                )]
+        for name in data[group]:
+            f90type, default, dimension = data[group][name]
+            if "int" in f90type.lower():
+                tmp += ["write(*, '(a, 99i9)') '# {GROUP}.{NAME}:', {NAME}".format(
+                    GROUP=group,
+                    NAME=name)
+                ]
+            elif "real" in f90type.lower():
+                tmp += ["write(*, '(a, 99es25.15)') '# {GROUP}.{NAME}:', {NAME}".format(
+                    GROUP=group,
+                    NAME=name)
+                ]
+            elif "char" in f90type.lower():
+                tmp += ["write(*, '(a, 99a)') '# {GROUP}.{NAME}:', trim({NAME})".format(
+                    GROUP=group,
+                    NAME=name)
+                ]
     return "\n".join(tmp)
 
+construct()
 
 print(template.format(
     DEFINE=create_define(),
