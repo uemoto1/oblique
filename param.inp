@@ -1,0 +1,38 @@
+&calculation
+    theory = "none"
+/
+
+&control
+    sysname = "sample"
+/
+
+&multiscale
+    nx_m = 1
+    ny_m = 1
+    nz_m = 1
+    
+    hx_m = 1.0d0
+    hy_m = 1.0d0
+    hz_m = 1.0d0
+
+    nxvacl_m = 100
+    nxvacr_m = 100
+/
+
+&emfield
+    ae_shape1 = "Acos2"
+    E_amplitude1 = 1.0d0
+    omega1 = 0.05d0
+    tw1 = 500.0d0
+    epdir_re1 = 0.0d0, 0.0d0, 1.0d0
+/
+
+&tgrid
+    dt = 0.05
+    nt = 10000
+/
+
+
+
+
+
