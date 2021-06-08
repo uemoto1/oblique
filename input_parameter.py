@@ -30,8 +30,19 @@ def construct():
     add_kw("multiscale", "hx_m", "real(8)", default="1.0d2")
     add_kw("multiscale", "hy_m", "real(8)", default="1.0d2")
     add_kw("multiscale", "hz_m", "real(8)", default="1.0d2")
-    add_kw("multiscale", "nxvacl_m", "integer", default="1000")
-    add_kw("multiscale", "nxvacr_m", "integer", default="1000")
+    add_kw("multiscale", "nzvacl_m", "integer", default="1000")
+    add_kw("multiscale", "nzvacr_m", "integer", default="1000")
+    add_kw("multiscale", "alpha", "real(8)", default="1.2d0")
+    add_kw("multiscale", "gamma", "real(8)", default="1.0d-3")
+    add_kw("multiscale", "omega0", "real(8)", default="1.0d0")
+
+
+
+
+
+
+
+
 
 
 

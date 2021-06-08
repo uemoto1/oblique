@@ -30,8 +30,11 @@ integer :: nz_m
 real(8) :: hx_m
 real(8) :: hy_m
 real(8) :: hz_m
-integer :: nxvacl_m
-integer :: nxvacr_m
+integer :: nzvacl_m
+integer :: nzvacr_m
+real(8) :: alpha
+real(8) :: gamma
+real(8) :: omega0
 contains
 subroutine read_input()
     implicit none
@@ -68,8 +71,11 @@ nz_m, &
 hx_m, &
 hy_m, &
 hz_m, &
-nxvacl_m, &
-nxvacr_m
+nzvacl_m, &
+nzvacr_m, &
+alpha, &
+gamma, &
+omega0
 
 theory = '1d'
 nt = 0
@@ -100,8 +106,11 @@ nz_m = 1
 hx_m = 1.0d2
 hy_m = 1.0d2
 hz_m = 1.0d2
-nxvacl_m = 1000
-nxvacr_m = 1000
+nzvacl_m = 1000
+nzvacr_m = 1000
+alpha = 1.2d0
+gamma = 1.0d-3
+omega0 = 1.0d0
 
     open(ifp, file='.namelist.tmp', action='write', status='replace')
     do while (.true.)
@@ -149,8 +158,11 @@ write(*, '(a, 99i9)') '# multiscale.nz_m:', nz_m
 write(*, '(a, 99es25.15)') '# multiscale.hx_m:', hx_m
 write(*, '(a, 99es25.15)') '# multiscale.hy_m:', hy_m
 write(*, '(a, 99es25.15)') '# multiscale.hz_m:', hz_m
-write(*, '(a, 99i9)') '# multiscale.nxvacl_m:', nxvacl_m
-write(*, '(a, 99i9)') '# multiscale.nxvacr_m:', nxvacr_m
+write(*, '(a, 99i9)') '# multiscale.nzvacl_m:', nzvacl_m
+write(*, '(a, 99i9)') '# multiscale.nzvacr_m:', nzvacr_m
+write(*, '(a, 99es25.15)') '# multiscale.alpha:', alpha
+write(*, '(a, 99es25.15)') '# multiscale.gamma:', gamma
+write(*, '(a, 99es25.15)') '# multiscale.omega0:', omega0
 
     return
 end subroutine read_input
