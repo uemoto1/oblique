@@ -15,9 +15,9 @@ calculation
     hy_m = 1.0d0
     hz_m = 10.0d0
 
-    nzvacl_m = 20000
-    nzvacr_m = 20000
-    theta_oblique_deg = 76.0
+    nzvacl_m = 40000
+    nzvacr_m = 40000
+    theta_oblique_deg = 77.0
     n_smooth_oblique = 24
 /
 
@@ -26,12 +26,12 @@ calculation
     E_amplitude1 = 1.0d0
     omega1 = 0.05d0
     tw1 = 500.0d0
-    epdir_re1 = 0.242, 0.000, -0.970
+    epdir_re1 = 0.225, 0.000, -0.974
     ! epdir_re1 = 0.0, 1.0, 0.0
 /
 
 &tgrid
-    dt = 0.02
+    dt = 0.01
     nt = 20000
 /
 

@@ -63,9 +63,6 @@ subroutine calc_oblique
         end if
     end do
 
-    do iz = lbound(w,1), ubound(w,1)
-        write(10,*) w(iz)
-    end do
     
 
     Ac_new = 0.0d0
@@ -106,18 +103,6 @@ subroutine calc_oblique
             & + 2.0d0 * cspeed_au * dt * sin(theta) / (cos(theta) ** 2) * (ac_cur(1, iz+1) - ac_cur(1, iz-1)) / (2.0d0 * hz_m) &
             & + 4.0d0 * pi * 2.0d0 * dt / (cos(theta) ** 2) * P_cur(3, iz) 
         end do
-
-
-    !     Ac_new_ms(3,ix_m,iy_m,iz_m) = 2*Ac_ms(3,ix_m,iy_m,iz_m) - Ac_old_ms(3,ix_m,iy_m,iz_m) &
-    !     & + (c_light*dt/cos_oblique)**2 &
-    !     & * (Ac_ms(3,ix_m+1,iy_m,iz_m)-2*Ac_ms(3,ix_m,iy_m,iz_m)+Ac_ms(3,ix_m-1,iy_m,iz_m))/Hx_m**2 &
-    !     & - 4*pi*dt**2*Jm_ms(3,ix_m,iy_m,iz_m) &
-    !     & - 4*pi*sin_oblique/cos_oblique**2*c_light*dt**2 &
-    !     & * (Pm_ms(1,ix_m+1,iy_m,iz_m)-Pm_ms(1,ix_m-1,iy_m,iz_m))/(2*Hx_m)
-    !   Ac_new_ms(1,ix_m,iy_m,iz_m) = Ac_old_ms(1,ix_m,iy_m,iz_m) &
-    !     & + 2*dt*c_light*sin_oblique/cos_oblique**2*(Ac_ms(3,ix_m+1,iy_m,iz_m)-Ac_ms(3,ix_m-1,iy_m,iz_m))/(2*Hx_m) &
-    !     & - 4*pi*(2*dt)/cos_oblique**2*Pm_ms(1,ix_m,iy_m,iz_m)
-  
 
         do iz = 1, nz_m
             Jld_new(1:3, iz) = c1 * Jld_cur(1:3, iz) - c2 * Jld_old(1:3, iz) &
