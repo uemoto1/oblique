@@ -35,6 +35,7 @@ def construct():
     add_kw("multiscale", "alpha", "real(8)", default="1.2d0")
     add_kw("multiscale", "gamma", "real(8)", default="1.0d-3")
     add_kw("multiscale", "omega0", "real(8)", default="1.0d0")
+    add_kw("multiscale", "theta_deg", "real(8)", default="0.0d0")
 
 
 

@@ -1,4 +1,4 @@
-&calculation
+calculation
     theory = "none"
 /
 
@@ -9,7 +9,7 @@
 &multiscale
     nx_m = 1
     ny_m = 1
-    nz_m = 1000
+    nz_m = 0
     
     hx_m = 1.0d0
     hy_m = 1.0d0
@@ -17,6 +17,7 @@
 
     nzvacl_m = 2000
     nzvacr_m = 2000
+    theta_deg = 45
 /
 
 &emfield
@@ -24,7 +25,7 @@
     E_amplitude1 = 1.0d0
     omega1 = 0.05d0
     tw1 = 500.0d0
-    epdir_re1 = 1.0d0, 0.0d0, 0.0d0
+    epdir_re1 = 0.0d0, 1.0d0, 0.0d0
 /
 
 &tgrid

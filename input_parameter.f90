@@ -35,6 +35,7 @@ integer :: nzvacr_m
 real(8) :: alpha
 real(8) :: gamma
 real(8) :: omega0
+real(8) :: theta_deg
 contains
 subroutine read_input()
     implicit none
@@ -75,7 +76,8 @@ nzvacl_m, &
 nzvacr_m, &
 alpha, &
 gamma, &
-omega0
+omega0, &
+theta_deg
 
 theory = '1d'
 nt = 0
@@ -111,6 +113,7 @@ nzvacr_m = 1000
 alpha = 1.2d0
 gamma = 1.0d-3
 omega0 = 1.0d0
+theta_deg = 0.0d0
 
     open(ifp, file='.namelist.tmp', action='write', status='replace')
     do while (.true.)
@@ -163,6 +166,7 @@ write(*, '(a, 99i9)') '# multiscale.nzvacr_m:', nzvacr_m
 write(*, '(a, 99es25.15)') '# multiscale.alpha:', alpha
 write(*, '(a, 99es25.15)') '# multiscale.gamma:', gamma
 write(*, '(a, 99es25.15)') '# multiscale.omega0:', omega0
+write(*, '(a, 99es25.15)') '# multiscale.theta_deg:', theta_deg
 
     return
 end subroutine read_input
