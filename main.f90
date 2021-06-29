@@ -23,9 +23,10 @@ subroutine calc_oblique
 
     real(8) :: c1, c2, c3
 
-    integer, parameter :: ns = 16
+    integer :: ns
 
-    theta = (pi / 180.0d0) * theta_deg
+    theta = (pi / 180.0d0) * theta_oblique_deg
+    ns = n_smooth_oblique
 
     allocate(Ac_old(1:3, -nzvacl_m-1: nz_m+nzvacr_m+1))
     allocate(Ac_cur(1:3, -nzvacl_m-1: nz_m+nzvacr_m+1))
