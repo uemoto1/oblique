@@ -18,9 +18,16 @@ calculation
     nzvacl_m = 40000
     nzvacr_m = 40000
 
+    ! Main layer
     alpha = 0.025d0
-    gamma = 0.001d0
     omega0 = 0.155d0
+    gamma = 1.0d-3
+
+    ! Substrate layer
+    nz_m_sub = 2000
+    alpha_sub = 0.02d0
+    omega0_sub = 0.4d0
+    gamma_sub = 75.0d-3
 
     theta_oblique_deg = 77.0
     n_smooth_oblique = 24
