@@ -1,6 +1,8 @@
-#FC=gfortran
-FC=ifort
-FFLAG=-axMIC-AVX512 -qopenmp -O3
+FC=gfortran
+FFLAG=-O3
+
+#FC=ifort
+#FFLAG=-axMIC-AVX512 -qopenmp -O3
 
 .PHONY: all clean
 
