@@ -37,6 +37,7 @@ real(8) :: gamma
 real(8) :: omega0
 real(8) :: theta_oblique_deg
 integer :: n_smooth_oblique
+integer :: nout
 contains
 subroutine read_input()
     implicit none
@@ -79,7 +80,8 @@ alpha, &
 gamma, &
 omega0, &
 theta_oblique_deg, &
-n_smooth_oblique
+n_smooth_oblique, &
+nout
 
 theory = '1d'
 nt = 0
@@ -117,6 +119,7 @@ gamma = 1.0d-3
 omega0 = 1.0d0
 theta_oblique_deg = 0.0d0
 n_smooth_oblique = 8
+nout = 100
 
     open(ifp, file='.namelist.tmp', action='write', status='replace')
     do while (.true.)
@@ -171,6 +174,7 @@ write(*, '(a, 99es25.15)') '# multiscale.gamma:', gamma
 write(*, '(a, 99es25.15)') '# multiscale.omega0:', omega0
 write(*, '(a, 99es25.15)') '# multiscale.theta_oblique_deg:', theta_oblique_deg
 write(*, '(a, 99i9)') '# multiscale.n_smooth_oblique:', n_smooth_oblique
+write(*, '(a, 99i9)') '# multiscale.nout:', nout
 
     return
 end subroutine read_input

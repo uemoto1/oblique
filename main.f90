@@ -1,4 +1,5 @@
 subroutine calc_oblique
+    !$ use omp_lib
     use input_parameter
     use em_field
     use phys_constants
@@ -24,6 +25,8 @@ subroutine calc_oblique
     real(8) :: c1, c2, c3
 
     integer :: ns
+
+    real(8) :: t1=0d0, t2=0d0
 
     theta = (pi / 180.0d0) * theta_oblique_deg
     ns = n_smooth_oblique
@@ -79,15 +82,19 @@ subroutine calc_oblique
     c2 = (1 - gamma * dt * 0.5d0) / (1.0d0 + gamma * dt * 0.5d0)
     c3 = alpha / (1.0d0 + gamma * dt * 0.5d0)
 
+    !$ write(*,*) "OpenMP #threads= ", omp_get_max_threads()
+    !$ t1 = omp_get_wtime()
+
+    !$omp parallel
     do it = 0, nt
 
+        !$omp do private(iz)
         do iz = 1, nz_m
             P_cur(1:3, iz) = w(iz) * Pld_cur(1:3, iz)
             J_cur(1:3, iz) = w(iz) * Jld_cur(1:3, iz)
         end do
 
-        Ac_new = 0.0d0
-
+        !$omp do private(iz)
         do iz = -nzvacl_m, nz_m+nzvacr_m
             Ac_new(1, iz) = 2.0d0 * Ac_cur(1, iz) - Ac_old(1, iz) &
             & + (cspeed_au * dt / cos(theta)) ** 2 * (Ac_cur(1, iz + 1) - 2 * Ac_cur(1, iz) + Ac_cur(1, iz - 1)) / hz_m ** 2 &
@@ -104,20 +111,26 @@ subroutine calc_oblique
             & + 4.0d0 * pi * 2.0d0 * dt / (cos(theta) ** 2) * P_cur(3, iz) 
         end do
 
+        !$omp do private(iz)
         do iz = 1, nz_m
             Jld_new(1:3, iz) = c1 * Jld_cur(1:3, iz) - c2 * Jld_old(1:3, iz) &
                 & - c3 * (Ac_new(1:3, iz) - 2.0d0 * Ac_cur(1:3, iz) + Ac_old(1:3, iz))
             Pld_new(1:3, iz) = Pld_old(1:3, iz) + 2.0d0 * dt * Jld_cur(1:3, iz)
         end do
 
-        Ac_old = Ac_cur
-        Ac_cur = Ac_new
-        Jld_old = Jld_cur
-        Jld_cur = Jld_new
-        Pld_old = Pld_cur
-        Pld_cur = Pld_new
-
-        if (mod(it, 100) == 0) then
+        !$omp do private(iz) 
+        do iz = -nzvacl_m-1, nz_m+nzvacr_m+1
+          Ac_old (:,iz) = Ac_cur (:,iz)
+          Ac_cur (:,iz) = Ac_new (:,iz)
+          Jld_old(:,iz) = Jld_cur(:,iz)
+          Jld_cur(:,iz) = Jld_new(:,iz)
+          Pld_old(:,iz) = Pld_cur(:,iz)
+          Pld_cur(:,iz) = Pld_new(:,iz)
+        end do
+        
+        if (mod(it, nout) == 0) then
+            !$OMP BARRIER
+            !$OMP MASTER
             write(file_ac, "('Ac_', i6.6, '.txt')") it
             open(10, file=trim(file_ac), action="write")
             do iz = -nzvacl_m, nz_m+nzvacr_m
@@ -125,10 +138,13 @@ subroutine calc_oblique
             end do
             close(10)
             ! Log
-            write(*, "(a,2es12.3e3)") trim(file_ac), minval(ac_cur), maxval(ac_cur)
+            !$ t2 = omp_get_wtime()
+            write(*, "(a,2es12.3e3,a,F10.3)") trim(file_ac), minval(ac_cur), maxval(ac_cur), "   time(s)=" , t2-t1
+            !$OMP END MASTER
         end if
 
     end do
+    !$omp end parallel
 
     stop
 contains
