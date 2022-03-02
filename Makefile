@@ -1,6 +1,9 @@
 FC=gfortran
 FFLAG=-O3
 
+#FC=ifort
+#FFLAG=-axMIC-AVX512 -qopenmp -O3
+
 .PHONY: all clean
 
 all: a.out
@@ -9,7 +12,7 @@ clean:
 	rm a.out *.o *.mod
 
 a.out: main.o input_parameter.o math_constants.o phys_constants.o em_field.o
-	$(FC) -o $@ $^
+	$(FC) $(FFLAG) -o $@ $^
 
 input_parameter.f90: input_parameter.py
 	python3 $< > $@
