@@ -1,4 +1,3 @@
-
 module input_parameter
     implicit none
 character(256) :: theory
@@ -35,6 +34,10 @@ integer :: nzvacr_m
 real(8) :: alpha
 real(8) :: gamma
 real(8) :: omega0
+integer :: nz_m_sub
+real(8) :: alpha_sub
+real(8) :: gamma_sub
+real(8) :: omega0_sub
 real(8) :: theta_oblique_deg
 integer :: n_smooth_oblique
 integer :: nout
@@ -79,6 +82,10 @@ nzvacr_m, &
 alpha, &
 gamma, &
 omega0, &
+nz_m_sub, &
+alpha_sub, &
+gamma_sub, &
+omega0_sub, &
 theta_oblique_deg, &
 n_smooth_oblique, &
 nout
@@ -117,6 +124,10 @@ nzvacr_m = 1000
 alpha = 1.2d0
 gamma = 1.0d-3
 omega0 = 1.0d0
+nz_m_sub = 0
+alpha_sub = 1.2d0
+gamma_sub = 1.0d-3
+omega0_sub = 1.0d0
 theta_oblique_deg = 0.0d0
 n_smooth_oblique = 8
 nout = 100
@@ -172,6 +183,10 @@ write(*, '(a, 99i9)') '# multiscale.nzvacr_m:', nzvacr_m
 write(*, '(a, 99es25.15)') '# multiscale.alpha:', alpha
 write(*, '(a, 99es25.15)') '# multiscale.gamma:', gamma
 write(*, '(a, 99es25.15)') '# multiscale.omega0:', omega0
+write(*, '(a, 99i9)') '# multiscale.nz_m_sub:', nz_m_sub
+write(*, '(a, 99es25.15)') '# multiscale.alpha_sub:', alpha_sub
+write(*, '(a, 99es25.15)') '# multiscale.gamma_sub:', gamma_sub
+write(*, '(a, 99es25.15)') '# multiscale.omega0_sub:', omega0_sub
 write(*, '(a, 99es25.15)') '# multiscale.theta_oblique_deg:', theta_oblique_deg
 write(*, '(a, 99i9)') '# multiscale.n_smooth_oblique:', n_smooth_oblique
 write(*, '(a, 99i9)') '# multiscale.nout:', nout
