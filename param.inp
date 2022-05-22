@@ -1,5 +1,5 @@
-calculation
-    theory = "none"
+&calculation
+    theory = "1d_normal"
 /
 
 &control
@@ -9,7 +9,7 @@ calculation
 &multiscale
     nx_m = 1
     ny_m = 1
-    nz_m = 0
+    nz_m = 200
     
     hx_m = 1.0d0
     hy_m = 1.0d0
@@ -17,7 +17,8 @@ calculation
 
     nzvacl_m = 2000
     nzvacr_m = 2000
-    theta_deg = 45
+    !theta_deg = 0
+    nrepri = 2
 /
 
 &emfield
@@ -30,7 +31,7 @@ calculation
 
 &tgrid
     dt = 0.05
-    nt = 20000
+    nt = 30000
 /
 
 

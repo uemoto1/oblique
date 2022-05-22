@@ -24,6 +24,7 @@ subroutine calc_oblique
     real(8), allocatable :: P_cur(:, :)
     real(8), allocatable :: w(:), w_sub(:)
     real(8) :: theta
+    integer :: jz
 
     character(256) :: file_ac
     integer :: it, iz
@@ -157,12 +158,28 @@ subroutine calc_oblique
             & + 4.0d0 * pi * 2.0d0 * dt / (cos(theta) ** 2) * P_cur(3, iz) 
         end do
 
-        !$omp do private(iz)
-        do iz = 1, nz_m
-            Jld_new(1:3, iz) = c1 * Jld_cur(1:3, iz) - c2 * Jld_old(1:3, iz) &
-                & - c3 * (Ac_new(1:3, iz) - 2.0d0 * Ac_cur(1:3, iz) + Ac_old(1:3, iz))
-            Pld_new(1:3, iz) = Pld_old(1:3, iz) + 2.0d0 * dt * Jld_cur(1:3, iz)
-        end do
+        if (nrepri > 1) then
+            !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            do iz = 1, nz_m, nrepri
+                Jld_new(1:3, iz) = c1 * Jld_cur(1:3, iz) - c2 * Jld_old(1:3, iz) &
+                    & - c3 * (Ac_new(1:3, iz) - 2.0d0 * Ac_cur(1:3, iz) + Ac_old(1:3, iz))
+                Pld_new(1:3, iz) = Pld_old(1:3, iz) + 2.0d0 * dt * Jld_cur(1:3, iz)
+                do jz = iz+1, min(nz_m, iz+nrepri-1)
+                    Jld_new(1:3, jz) = Jld_new(1:3, iz)
+                    Pld_new(1:3, jz) = Pld_new(1:3, iz)
+                end do
+            end do
+            !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        else
+            !$omp do private(iz)
+            do iz = 1, nz_m
+                Jld_new(1:3, iz) = c1 * Jld_cur(1:3, iz) - c2 * Jld_old(1:3, iz) &
+                    & - c3 * (Ac_new(1:3, iz) - 2.0d0 * Ac_cur(1:3, iz) + Ac_old(1:3, iz))
+                Pld_new(1:3, iz) = Pld_old(1:3, iz) + 2.0d0 * dt * Jld_cur(1:3, iz)
+            end do
+        end if
 
         !$omp do private(iz) 
         do iz = -nzvacl_m-1, nz_m+nzvacr_m+1
@@ -237,7 +254,7 @@ subroutine calc_normal
 
     real(8) :: cp1 
     character(256) :: file_ac
-    integer :: it, iz
+    integer :: it, iz, jz
 
     real(8) :: c1, c2, c3
 
@@ -270,10 +287,34 @@ subroutine calc_normal
                 & + 4.0 * pi * Jld_cur(2, iz) * dt ** 2
         end do
 
-        do iz = 1, nz_m
-            Jld_new(1:3, iz) = c1 * Jld_cur(1:3, iz) - c2 * Jld_old(1:3, iz) &
+        if (nrepri > 1) then
+            !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            do iz = 1, nz_m, nrepri
+                ! write(*, *) "iz", iz
+                Jld_new(1:3, iz) = c1 * Jld_cur(1:3, iz) - c2 * Jld_old(1:3, iz) &
                 & - c3 * (Ac_new(1:3, iz) - 2.0d0 * Ac_cur(1:3, iz) + Ac_old(1:3, iz))
-        end do
+                do jz = iz+1, min(iz+nrepri-1, nz_m)
+                    Jld_new(1:3, jz) =  Jld_new(1:3, iz)
+                end do
+            end do
+            !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        else
+            do iz = 1, nz_m
+                Jld_new(1:3, iz) = c1 * Jld_cur(1:3, iz) - c2 * Jld_old(1:3, iz) &
+                    & - c3 * (Ac_new(1:3, iz) - 2.0d0 * Ac_cur(1:3, iz) + Ac_old(1:3, iz))
+            end do
+        end if
+
+        ! write(*,*) "nz_m", nz_m
+        ! open(90, file="sample.txt", action="write")
+        ! if (it == 10) then
+        !     do iz = 1, nz_m
+        !         write(90, "(a,i6,es25.15e4)") "CHECK", iz, Jld_new(2, iz)
+        !     end do
+        ! end if
+        ! close(90)
 
 
         Ac_old = Ac_cur
@@ -289,6 +330,7 @@ subroutine calc_normal
                 write(10, "(4es20.10e4)") iz * hz_m, ac_cur(:, iz)
             end do
             close(10)
+            write(99, "(4es25.15e4)") it*dt, Jld_new(:, 1)
         end if
     end do
 
@@ -308,7 +350,13 @@ program main
     use input_parameter
     implicit none
     call read_input()
-
-    call calc_oblique
+    select case(trim(theory))
+    case("1d_normal")
+        call calc_normal()
+    case("1d_oblique")
+        call calc_oblique()
+    case default
+        stop "unknown theory"
+    end select
     stop
 end program main

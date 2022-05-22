@@ -1,5 +1,5 @@
 calculation
-    theory = "none"
+    theory = "1d_oblique"
 /
 
 &control

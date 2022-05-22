@@ -41,6 +41,8 @@ def construct():
     add_kw("multiscale", "omega0_sub", "real(8)", default="1.0d0")
     add_kw("multiscale", "theta_oblique_deg", "real(8)", default="0.0d0")
     add_kw("multiscale", "n_smooth_oblique", "integer", default="8")
+    add_kw("multiscale", "nrepri", "integer", default="1")
+    add_kw("multiscale", "nout", "integer", default="100")
 
 
 
